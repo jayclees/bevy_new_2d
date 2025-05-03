@@ -2,8 +2,10 @@
 //! We can add all manner of settings and accessibility options here.
 //! For 3D, we'd also place the camera sensitivity and FOV here.
 
+use std::any::type_name;
 use bevy::{audio::Volume, prelude::*, ui::Val::*};
-
+use bevy_persistent::{Persistent, StorageFormat};
+use serde::{Deserialize, Serialize};
 use crate::{screens::Screen, theme::prelude::*};
 
 pub(super) fn plugin(app: &mut App) {
@@ -12,11 +14,15 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<GlobalVolumeLabel>();
     app.add_systems(
         Update,
-        update_volume_label.run_if(in_state(Screen::Settings)),
+        (
+            update_volume_label.run_if(in_state(Screen::Settings)),
+            save_volume
+                .run_if(resource_changed::<GlobalVolume>.and(not(resource_added::<GlobalVolume>))),
+        ),
     );
 }
 
-fn spawn_settings_screen(mut commands: Commands) {
+fn spawn_settings_screen(mut commands: Commands, global_volume: Res<GlobalVolume>) {
     commands.spawn((
         widget::ui_root("Settings Screen"),
         StateScoped(Screen::Settings),
@@ -93,6 +99,26 @@ fn update_volume_label(
     let percent = (factor * 100.0).round();
     let text = format!("{}%", percent);
     label.0 = text;
+}
+
+#[derive(Serialize, Deserialize)]
+struct GlobalVolumeWrapper(GlobalVolume);
+
+fn save_volume(mut commands: Commands, global_volume: Res<GlobalVolume>) {
+    let config_dir = dirs::config_dir().unwrap().join("your-amazing-game");
+    commands.insert_resource(
+        Persistent::<GlobalVolume>::builder()
+            .name("global volume")
+            .format(StorageFormat::Ron)
+            .path(config_dir.join("settings.toml"))
+            .default(
+                GlobalVolumeWrapper(GlobalVolume {
+                    volume: global_volume.volume
+                })
+            )
+            .build()
+            .expect("failed to initialize global volume")
+    );
 }
 
 fn enter_title_screen(_: Trigger<Pointer<Click>>, mut next_screen: ResMut<NextState<Screen>>) {

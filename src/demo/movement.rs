@@ -14,7 +14,8 @@
 //! consider using a [fixed timestep](https://github.com/bevyengine/bevy/blob/main/examples/movement/physics_in_fixed_timestep.rs).
 
 use bevy::{prelude::*, window::PrimaryWindow};
-
+use bevy_persistent::{Persistent, StorageFormat};
+use serde::{Deserialize, Serialize};
 use crate::AppSet;
 
 pub(super) fn plugin(app: &mut App) {
@@ -23,16 +24,19 @@ pub(super) fn plugin(app: &mut App) {
 
     app.add_systems(
         Update,
-        (apply_movement, apply_screen_wrap)
+        (
+            (apply_movement, apply_screen_wrap)
             .chain()
             .in_set(AppSet::Update),
+            save_position
+        )
     );
 }
 
 /// These are the movement parameters for our character controller.
 /// For now, this is only used for a single player, but it could power NPCs or
 /// other players as well.
-#[derive(Component, Reflect)]
+#[derive(Component, Reflect, Debug)]
 #[reflect(Component)]
 pub struct MovementController {
     /// The direction the character wants to move in.
@@ -78,4 +82,29 @@ fn apply_screen_wrap(
         let wrapped = (position + half_size).rem_euclid(size) - half_size;
         transform.translation = wrapped.extend(transform.translation.z);
     }
+}
+
+#[derive(Resource, Serialize, Deserialize)]
+pub struct PlayerPosition {
+    position: Vec3,
+}
+
+fn save_position(
+    mut commands: Commands,
+    query: Query<&Transform, (Changed<Transform>)>
+) {
+    // for transform in query {
+    //     dbg!(transform);
+    //     std::process::exit(1);
+    // }
+    // let config_dir = dirs::config_dir().unwrap().join(env!("CARGO_PKG_NAME"));
+    //
+    // let persistent = Persistent::<PlayerPosition>::builder()
+    //     .name("player position")
+    //     .format(StorageFormat::Ron)
+    //     .path(config_dir.join("saved-state.ron"))
+    //     .default(PlayerPosition { position: Vec3::splat(0.0) })
+    //     .build()
+    //     .expect("failed to initialize player position");
+    // commands.insert_resource(persistent)
 }
