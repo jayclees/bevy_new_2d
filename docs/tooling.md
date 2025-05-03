@@ -21,7 +21,7 @@ A few libraries that the authors of this template have vetted and think you migh
 | [`bevy_egui`](https://github.com/mvlabat/bevy_egui)                                    | UI / Debugging | UI framework (great for debug UI)     |
 | [`tiny_bail`](https://github.com/benfrankel/tiny_bail)                                 | Error handling | Error handling macros                 |
 
-In particular:.
+In particular:
 
 - `leafwing-input-manager` is very likely to be upstreamed into Bevy in the near future.
 - `bevy-inspector-egui` and `bevy_mod_debugdump` help fill the gap until Bevy has its own editor.
@@ -29,6 +29,18 @@ In particular:.
 - `bevy_cobweb_ui` is well-aligned with `bevy_ui` and helps fill the gap until Bevy has a full collection of UI widgets and features.
 
 None of these are necessary, but they can save you a lot of time and effort.
+
+## CLI tools
+
+A few command-line tools that you may find useful:
+
+|Name|Description|
+|-|-|
+|[`bevy_lint`](https://thebevyflock.github.io/bevy_cli/bevy_lint/)|Checks for good practices and footguns specific to Bevy|
+
+> [!NOTE]
+>
+> `bevy_lint` is run in CI by default (see [workflows](./workflows.md)), but you do not need it to use this template.
 
 ## VS Code extensions
 

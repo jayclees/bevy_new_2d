@@ -8,6 +8,7 @@ The [CI workflow](.github/workflows/ci.yaml) will trigger on every commit or PR 
 
 - Run tests.
 - Run Clippy lints.
+- Run [Bevy lints](https://thebevyflock.github.io/bevy_cli/bevy_lint/).
 - Check formatting.
 - Check documentation.
 

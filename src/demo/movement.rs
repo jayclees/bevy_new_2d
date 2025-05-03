@@ -16,7 +16,7 @@
 use bevy::{prelude::*, window::PrimaryWindow};
 use bevy_persistent::{Persistent, StorageFormat};
 use serde::{Deserialize, Serialize};
-use crate::AppSet;
+use crate::AppSystems;
 
 pub(super) fn plugin(app: &mut App) {
     app.register_type::<MovementController>();
@@ -27,7 +27,7 @@ pub(super) fn plugin(app: &mut App) {
         (
             (apply_movement, apply_screen_wrap)
             .chain()
-            .in_set(AppSet::Update),
+            .in_set(AppSystems::Update),
             save_position
         )
     );
