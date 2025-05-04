@@ -10,7 +10,7 @@ mod screens;
 mod theme;
 
 use bevy::{asset::AssetMetaCheck, prelude::*};
-use bevy_pkv::PkvStore;
+use bevy_pkv::{PkvStore};
 
 pub struct AppPlugin;
 
@@ -61,7 +61,7 @@ impl Plugin for AppPlugin {
             theme::plugin,
         ));
 
-        app.insert_resource(PkvStore::new("FooCompany", "BarGame"));
+        app.insert_resource(PkvStore::new("The Bevy Flock", env!("CARGO_PKG_NAME")));
     }
 }
 

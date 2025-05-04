@@ -3,7 +3,8 @@
 //! For 3D, we'd also place the camera sensitivity and FOV here.
 
 use bevy::{audio::Volume, prelude::*, ui::Val::*};
-
+use bevy::audio::GlobalVolume;
+use bevy_pkv::{PkvStore, SetError};
 use crate::{screens::Screen, theme::prelude::*};
 
 pub(super) fn plugin(app: &mut App) {
@@ -12,7 +13,11 @@ pub(super) fn plugin(app: &mut App) {
     app.register_type::<GlobalVolumeLabel>();
     app.add_systems(
         Update,
-        update_volume_label.run_if(in_state(Screen::Settings)),
+        (
+            update_volume_label.run_if(in_state(Screen::Settings)),
+            save_volume
+                .run_if(resource_changed::<GlobalVolume>.and(not(resource_added::<GlobalVolume>))),
+        ),
     );
 }
 
@@ -97,4 +102,13 @@ fn update_volume_label(
 
 fn enter_title_screen(_: Trigger<Pointer<Click>>, mut next_screen: ResMut<NextState<Screen>>) {
     next_screen.set(Screen::Title);
+}
+
+fn save_volume(mut pkv: ResMut<PkvStore>, global_volume: Res<GlobalVolume>) -> Result<(), SetError> {
+    let (volume_type, value) = match global_volume.volume {
+        Volume::Linear(value) => ("Linear", value),
+        Volume::Decibels(value) => ("Decibels", value),
+    };
+    pkv.set("global_volume_type", &volume_type)?;
+    pkv.set("global_volume_value", &value)
 }
